@@ -30,6 +30,18 @@
             <distribution>local</distribution>
         </license>
     </licenses>
+	<distributionManagement>
+	<repository>
+		<id>artifactory-releases</id>
+		<name>artifactory release repository</name>
+		<url>http://development.thecloud.net/artifactory/ext-release-local</url>
+	</repository>
+	<snapshotRepository>
+		<id>artifactory-snapshots</id>
+		<name>artifactory snapshot repository</name>
+		<url>http://development.thecloud.net/artifactory/ext-snapshot-local</url>
+	</snapshotRepository>
+	</distributionManagement>
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
