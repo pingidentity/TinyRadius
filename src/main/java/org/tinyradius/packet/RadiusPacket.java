@@ -559,6 +559,14 @@ public class RadiusPacket {
 		}
 		return attr.getAttributeValue();
 	}
+	
+	public byte[] getAttributeData(String type) {
+		RadiusAttribute attr = getAttribute(type);
+		if (attr == null) {
+			return null;
+		}
+		return attr.getAttributeData();
+	}
 
 	/**
 	 * Returns the Vendor-Specific attribute(s) for the given vendor ID.
