@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tinyradius.attribute.RadiusAttribute;
 import org.tinyradius.packet.AccessRequest;
 import org.tinyradius.packet.AccountingRequest;
@@ -118,7 +118,7 @@ public abstract class RadiusServer {
 					}
 					catch (Exception e) {
 						e.printStackTrace();
-						logger.fatal("auth thread stopped by exception", e);
+						logger.error("auth thread stopped by exception", e);
 					}
 					finally {
 						authSocket.close();
@@ -139,7 +139,7 @@ public abstract class RadiusServer {
 					}
 					catch (Exception e) {
 						e.printStackTrace();
-						logger.fatal("acct thread stopped by exception", e);
+						logger.error("acct thread stopped by exception", e);
 					}
 					finally {
 						acctSocket.close();
@@ -574,7 +574,7 @@ public abstract class RadiusServer {
 	private List receivedPackets = new LinkedList();
 	private long duplicateInterval = 30000; // 30 s
 	protected transient boolean closing = false;
-	private static Log logger = LogFactory.getLog(RadiusServer.class);
+	private static Logger logger = LoggerFactory.getLogger(RadiusServer.class);
 
 }
 

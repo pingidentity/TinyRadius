@@ -10,8 +10,8 @@ package org.tinyradius.packet;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tinyradius.attribute.RadiusAttribute;
 import org.tinyradius.attribute.StringAttribute;
 import org.tinyradius.util.RadiusException;
@@ -427,6 +427,6 @@ public class AccessRequest extends RadiusPacket {
 	/**
 	 * Logger for logging information about malformed packets
 	 */
-	private static Log logger = LogFactory.getLog(AccessRequest.class);
+	private static Logger logger = LoggerFactory.getLogger(AccessRequest.class);
 
 }
