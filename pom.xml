@@ -22,6 +22,10 @@
             <id>ctran</id>
             <email>cuong.tran@gmail.com</email>
         </developer>
+        <developer>
+          <id>meh</id>
+          <name>Brian Campbell</name>
+        </developer>
     </developers>
     <licenses>
         <license>
