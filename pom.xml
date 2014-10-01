@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.tinyradius</groupId>
+    <groupId>com.github.b---c</groupId>
     <artifactId>tinyradius</artifactId>
-    <version>1.1.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>TinyRadius Java Radius Library</name>
     <description>
         TinyRadius is a simple, small and fast Java Radius library capable of sending and receiving Radius packets of all types. It is released under the terms of the LGPL.
     </description>
-    <url>https://github.com/ctran/TinyRadius</url>
+    <url>https://github.com/b---c/TinyRadius</url>
     <developers>
         <developer>
             <id>wuttke</id>
@@ -45,6 +45,7 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
+      <scope>provided</scope>
 		</dependency>
 
     </dependencies>
