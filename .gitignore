@@ -6,6 +6,6 @@ target
 .settings
 .classpath
 .project
-tinyradius.iml
-tinyradius.ipr
-tinyradius.iws
+*.iml
+*.ipr
+*.iws
