@@ -1,3 +1,12 @@
+This (New)TinyRadius project was created primarily to enable the TinyRadius
+RADIUS server to be multi-threaded.
+
+This (New)TinyRadius project is derived from https://github.com/dlad/TinyRadius
+which (I think) was derived from the original TinyRadius at
+http://tinyradius.sourceforge.net/ to fix some bugs (like issues with long passwords)
+
+
+======  Original TinyRadius README ======
 TinyRadius README
 
 TinyRadius is a simple, small and fast Java Radius library capable of
