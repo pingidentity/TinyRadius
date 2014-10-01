@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.bc_tinyradius.attribute.RadiusAttribute;
@@ -35,7 +38,18 @@ import org.bc_tinyradius.packet.RadiusPacket;
  */
 public abstract class RadiusServer {
 
-	/**
+    ExecutorService serverThreadPool;
+
+
+    protected RadiusServer() {
+        serverThreadPool = Executors.newSingleThreadExecutor();
+    }
+
+    protected RadiusServer(ExecutorService serverThreadPool) {
+        this.serverThreadPool = serverThreadPool;
+    }
+
+    /**
 	 * Returns the shared secret used to communicate with the client with the
 	 * passed IP address or null if the client is not allowed at this server.
 	 * 
@@ -160,6 +174,7 @@ public abstract class RadiusServer {
 			authSocket.close();
 		if (acctSocket != null)
 			acctSocket.close();
+        serverThreadPool.shutdown();
 	}
 
 	/**
@@ -328,73 +343,76 @@ public abstract class RadiusServer {
 	 * @param s
 	 *            socket to listen on
 	 */
-	protected void listen(DatagramSocket s) {
-		DatagramPacket packetIn = new DatagramPacket(new byte[RadiusPacket.MAX_PACKET_LENGTH], RadiusPacket.MAX_PACKET_LENGTH);
-		while (true) {
-			try {
-				// receive packet
-				try {
-					logger.trace("about to call socket.receive()");
-					s.receive(packetIn);
-					if (logger.isDebugEnabled())
-						logger.debug("receive buffer size = " + s.getReceiveBufferSize());
-				}
-				catch (SocketException se) {
-					if (closing) {
-						// end thread
-						logger.info("got closing signal - end listen thread");
-						return;
-					}
-					// retry s.receive()
-					logger.error("SocketException during s.receive() -> retry", se);
-					continue;
-				}
+    protected void listen(final DatagramSocket s) {
+        while (true) {
 
-				// check client
-				InetSocketAddress localAddress = (InetSocketAddress) s.getLocalSocketAddress();
-				InetSocketAddress remoteAddress = new InetSocketAddress(packetIn.getAddress(), packetIn.getPort());
-				String secret = getSharedSecret(remoteAddress);
-				if (secret == null) {
-					if (logger.isInfoEnabled())
-						logger.info("ignoring packet from unknown client " + remoteAddress + " received on local address " + localAddress);
-					continue;
-				}
+            // receive packet
+            try {
+                logger.trace("about to call socket.receive()");
+                final DatagramPacket packetIn = new DatagramPacket(new byte[RadiusPacket.MAX_PACKET_LENGTH], RadiusPacket.MAX_PACKET_LENGTH);
+                s.receive(packetIn);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("receive buffer size = " + s.getReceiveBufferSize());
+                }
 
-				// parse packet
-				RadiusPacket request = makeRadiusPacket(packetIn, secret);
-				if (logger.isInfoEnabled())
-					logger.info("received packet from " + remoteAddress + " on local address " + localAddress + ": " + request);
+                final InetSocketAddress localAddress = (InetSocketAddress) s.getLocalSocketAddress();
 
-				// handle packet
-				logger.trace("about to call RadiusServer.handlePacket()");
-				RadiusPacket response = handlePacket(localAddress, remoteAddress, request, secret);
+                // dispatch to the thread pool for processing
+                serverThreadPool.submit(new Runnable() {
+                    public void run() {
+                        try {
+                            // check client
+                            InetSocketAddress remoteAddress = new InetSocketAddress(packetIn.getAddress(), packetIn.getPort());
+                            String secret = getSharedSecret(remoteAddress);
+                            if (secret == null) {
+                                if (logger.isInfoEnabled()) { logger.info("ignoring packet from unknown client " + remoteAddress + " received on local address " + localAddress);}
+                                return;
+                            }
 
-				// send response
-				if (response != null) {
-					if (logger.isInfoEnabled())
-						logger.info("send response: " + response);
-					DatagramPacket packetOut = makeDatagramPacket(response, secret, remoteAddress.getAddress(), packetIn.getPort(), request);
-					s.send(packetOut);
-				}
-				else
-					logger.info("no response sent");
-			}
-			catch (SocketTimeoutException ste) {
-				// this is expected behaviour
-				logger.trace("normal socket timeout");
-			}
-			catch (IOException ioe) {
-				// error while reading/writing socket
-				logger.error("communication error", ioe);
-			}
-			catch (RadiusException re) {
-				// malformed packet
-				logger.error("malformed Radius packet", re);
-			}
-		}
-	}
+                            // parse packet
+                            RadiusPacket request = makeRadiusPacket(packetIn, secret);
+                            if (logger.isInfoEnabled()) {logger.info("received packet from " + remoteAddress + " on local address " + localAddress + ": " + request); }
 
-	/**
+                            // handle packet
+                            logger.trace("about to call RadiusServer.handlePacket()");
+                            RadiusPacket response = handlePacket(localAddress, remoteAddress, request, secret);
+
+                            // send response
+                            if (response != null) {
+                                if (logger.isInfoEnabled()) { logger.info("send response: " + response); }
+                                DatagramPacket packetOut = makeDatagramPacket(response, secret, remoteAddress.getAddress(), packetIn.getPort(), request);
+                                s.send(packetOut);
+                            } else {
+                                logger.info("no response sent");
+                            }
+                        } catch (IOException ioe) {
+                            // error while reading/writing socket
+                            logger.error("communication error", ioe);
+                        } catch (RadiusException re) {
+                            // malformed packet
+                            logger.error("malformed Radius packet", re);
+                        }
+                    }
+                });
+            } catch (SocketException se) {
+                if (closing) {
+                    // end thread
+                    logger.info("got closing signal - end listen thread");
+                    return;
+                }
+                // retry s.receive()
+                logger.error("SocketException during s.receive() -> retry", se);
+            } catch (SocketTimeoutException ste) {
+                // this is expected behaviour
+                if (logger.isTraceEnabled()) { logger.trace("normal socket timeout");}
+            } catch (IOException e) {
+                logger.error("communication error", e);
+            }
+        }
+    }
+
+
+    /**
 	 * Handles the received Radius packet and constructs a response.
 	 * 
 	 * @param localAddress
