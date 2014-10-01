@@ -101,7 +101,7 @@ if (response.getPacketType() == RadiusPacket.ACCESS_ACCEPT) {
 
 <h3>EXAMPLE 3: How to implement a Radius server</h3>
 
-<p>You need to subclass <code>org.tinyradius.util.RadiusServer</code>.
+<p>You need to subclass <code>org.bc_tinyradius.util.RadiusServer</code>.
 Provide an implementation for the following methods:</p>
 
 <pre>String getSharedSecret(InetAddress client);</pre>
@@ -135,7 +135,7 @@ server.stop();</pre>
 
 <h3>EXAMPLE 4: How to implement a Radius proxy server</h3>
 
-<p>You need to subclass <code>org.tinyradius.proxy.RadiusProxy</code>.
+<p>You need to subclass <code>org.bc_tinyradius.proxy.RadiusProxy</code>.
 In addition to implementing the abstract methods from <code>RadiusServer</code>,
 you have to provide an implementation for the following method.</p>
 
