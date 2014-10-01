@@ -81,4 +81,11 @@
             </plugin>
         </plugins>
     </build>
+
+    <scm>
+      <connection>scm:git:ssh://git@github.com:b---c/TinyRadius.git</connection>
+      <developerConnection>scm:git:ssh://git@github.com:b---c/TinyRadius.git</developerConnection>
+      <url>https://github.com/b---c/TinyRadius</url>
+    </scm>
+
 </project>
