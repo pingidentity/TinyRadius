@@ -83,7 +83,7 @@
     </build>
 
     <scm>
-      <connection>scm:git:git://github.com/b---c/TinyRadius.git</connection>
+      <connection>scm:git:ssh://github.com/b---c/TinyRadius.git</connection>
       <url>https://github.com/b---c/TinyRadius</url>
     </scm>
 </project>
